@@ -14,7 +14,7 @@ import webbrowser
 PAGE_CONFIG = {"page_title" : "Medium Article Recommender", "layout" : "centered"}
 st.set_page_config(layout = 'wide')
 
-final = pd.read_csv('Data Files/final.csv')
+final = pd.read_csv('https://github.com/FlintyTub49/Medium-Article-Recommender/blob/main/Data%20Files/final.csv?raw=true')
 
 
 # ----------------------------------
