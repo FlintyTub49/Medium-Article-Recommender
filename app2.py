@@ -13,7 +13,8 @@ import webbrowser
 
 PAGE_CONFIG = {"page_title" : "Medium Article Recommender", "layout" : "centered"}
 st.set_page_config(layout = 'wide')
-final = pd.read_csv('final.csv')
+
+final = pd.read_csv('Data Files/final.csv')
 
 
 # ----------------------------------
