@@ -11,10 +11,14 @@ import streamlit.components.v1 as components
 import random
 import webbrowser
 import vaex
+import os
 
 PAGE_CONFIG = {"page_title" : "Medium Article Recommender", "layout" : "centered"}
 st.set_page_config(layout = 'wide')
-final = vaex.open('https://github.com/FlintyTub49/Medium-Article-Recommender/blob/main/Data%20Files/final.csv.hdf5')
+
+package_dir = os.path.dirname(os.path.abspath('testing.py'))
+data_file = os.path.join(package_dir,'Data Files/final.csv.hdf5')
+final = vaex.open(data_file)
 
 
 # ----------------------------------
