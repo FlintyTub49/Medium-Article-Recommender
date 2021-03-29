@@ -1,0 +1,3 @@
+# this file exists so that we know when not to do the
+# Data Files/final.csv → Data Files/final.csv.hdf5 conversion
+fingerprint: ed25a50b3783f87f1156c0e64dc506a4
