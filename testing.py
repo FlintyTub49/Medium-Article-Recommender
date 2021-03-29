@@ -2,7 +2,6 @@
 import pandas as pd
 import numpy as np
 import streamlit as st
-from pyngrok import ngrok
 import matplotlib.pyplot as plt
 import plotly.express as px
 import plotly.graph_objects as go
@@ -15,7 +14,7 @@ import vaex
 
 PAGE_CONFIG = {"page_title" : "Medium Article Recommender", "layout" : "centered"}
 st.set_page_config(layout = 'wide')
-final = vaex.open('Data Files/final.csv.hdf5')
+final = vaex.open('https://github.com/FlintyTub49/Medium-Article-Recommender/blob/main/Data%20Files/final.csv.hdf5')
 
 
 # ----------------------------------
