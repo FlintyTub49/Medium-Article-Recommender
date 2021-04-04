@@ -1,3 +1,4 @@
+
 import pandas as pd
 import numpy as np
 import streamlit as st
@@ -15,7 +16,7 @@ import os
 PAGE_CONFIG = {"page_title" : "Medium Article Recommender", "layout" : "centered"}
 st.set_page_config(layout = 'wide')
 
-package_dir = os.path.dirname(os.path.abspath('testing.py'))
+package_dir = os.path.dirname(os.path.abspath('app-v2.py'))
 data_file = os.path.join(package_dir,'Data Files/final.csv.hdf5')
 final = vaex.open(data_file)
 
