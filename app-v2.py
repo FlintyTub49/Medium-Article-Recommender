@@ -1,4 +1,3 @@
-
 import pandas as pd
 import numpy as np
 import streamlit as st
@@ -12,6 +11,7 @@ import random
 import webbrowser
 import vaex
 import os
+from collections import Counter
 
 PAGE_CONFIG = {"page_title" : "Medium Article Recommender", "layout" : "centered"}
 st.set_page_config(layout = 'wide')
@@ -88,6 +88,47 @@ def filtKeyword(df, text):
     else:
         return df[df['Titles'].str.contains(text)]
 
+
+# ----------------------------------
+# Plotting Distribution Of Topics
+# ----------------------------------
+def plotDistTopics(df):
+    val = df['Max Prob Topic'].value_counts()
+    val = pd.DataFrame(val).reset_index().rename(columns = {'index':'Topic', 0:'Count'})
+    fig = px.histogram(val, y = 'Topic', x = 'Count', orientation = 'h')
+    fig.update_layout({
+        'plot_bgcolor': 'rgba(0, 0, 0, 0)',
+        'paper_bgcolor': 'rgba(0, 0, 0, 0)',
+    })
+    return fig
+
+
+# ----------------------------------
+# Plotting Distribution Of Words
+# ----------------------------------
+def plotDistWords(df):
+    filter = df[df['Actual Text'].str.count(' ') < 4500]
+    count = (filter['Actual Text'].str.count(' ') + 1).tolist()
+    fig = px.histogram(y = count, labels = {'y' : 'No. Of Words'}, orientation = 'h')
+    fig.update_layout({
+        'plot_bgcolor': 'rgba(0, 0, 0, 0)',
+        'paper_bgcolor': 'rgba(0, 0, 0, 0)',
+    })
+    return fig
+
+
+# ----------------------------------
+# Plotting Distribution Of Words
+# ----------------------------------
+def readingDist(df):
+    demo = df[df['Reading Time'] < 30]
+    fig = px.histogram(x = demo['Reading Time'].tolist(), labels = {'x': 'Reading Time'})
+    fig.update_layout({
+        'plot_bgcolor': 'rgba(0, 0, 0, 0)',
+        'paper_bgcolor': 'rgba(0, 0, 0, 0)',
+    })
+    return fig
+
     
 # ----------------------------------
 # For Centering Stuff On Page
@@ -106,7 +147,7 @@ page_bg_img = '''
 # Main App Running
 # ----------------------------------
 def main():
-    st.title('Medium Article Recommendation System')
+    # st.title('Medium Article Recommendation System')
     topic_names = ['Business and Startups', 'Fundamental Coding', 'Data Science & Statistics', 'Literature',
                    'Web Development', 'Social Media & Branding', 'Marketing & Sales', 'Team Dynamics',
                    'Cloud Development', 'Machine Learning & Deep Learning']
@@ -114,7 +155,7 @@ def main():
     # ----------------------------------
     # Side Bar Menu
     # ----------------------------------
-    menu = ['Recommendation System', 'Search Articles']
+    menu = ['Recommendation System', 'Visualizations', 'Search Articles']
     choice = st.sidebar.selectbox('Menu', menu)
     
     
@@ -122,6 +163,7 @@ def main():
     # Main Recommendation System 
     # ----------------------------------
     if choice == 'Recommendation System':
+        st.title('Medium Article Recommendation System')
         st.subheader('A Recommendation Systemn for Medium Articles Based on Topic Selection')
         st.markdown(page_bg_img, unsafe_allow_html=True)
 
@@ -209,14 +251,87 @@ def main():
             col2.subheader('{}'.format(link))
         col2.markdown(page_bg_img, unsafe_allow_html = True)
     
-    
+
+    # ----------------------------------
+    # Find Article Based On Keywords 
+    # ----------------------------------
+    elif choice == 'Visualizations':
+        st.header('Visualizations')
+        st.subheader('Select Appropriate Filters To Change Dashboard')
+        st.write('')
+        st.markdown(page_bg_img, unsafe_allow_html = True)
+
+
+        # ----------------------------------
+        # Query To Find In What Topic
+        # ----------------------------------
+        topics = ['All'] + topic_names
+        topic = st.selectbox('Topics', topics)
+        st.markdown(page_bg_img, unsafe_allow_html = True)
+
+
+        # ----------------------------------
+        # Show Which Graphs To Display
+        # ----------------------------------
+        _, f1, _, f2, _ = st.beta_columns((1.5, 1.2, 0.6, 1.2, 1.5,))
+        if topic == 'All': text = 'Count Of Topics'
+        else: text = 'WordCount of Articles'
+        dist = f1.checkbox(text)
+        wc = f1.checkbox('WordCloud')
+        readT = f2.checkbox('Reading Time Distribution')
+        
+        
+        _, col, _ = st.beta_columns((1, 2, 1))
+        col.write('')
+
+        if not dist and not wc and not readT:
+            col.subheader('Select Visualizations To Display')
+
+        else:
+            if dist:
+                # --------------------------------------
+                # Showing Distribution Plot Or WordPlot
+                # --------------------------------------
+                if topic == 'All':
+                    col.header('Distribution of All The Topics')
+                    distTopic = plotDistTopics(final)
+                    col.plotly_chart(distTopic, height = 1200)
+
+                else:
+                    col.header('Distribution of No. of Words in {} Articles'.format(topic))
+                    filter = filtTopic(df = final, topic = topic)
+                    distWord = plotDistWords(filter)
+                    col.plotly_chart(distWord, height = 300)
+
+
+            if wc:
+                # ----------------------------------
+                # Showing The Appropriate WordCloud
+                # ----------------------------------
+                col.header('WordCloud For {} Topics'.format(topic))
+                wc = os.path.join(package_dir,'wcClouds/{}.jpg'.format(topic))
+                col.image(wc, caption = 'WordCloud For {}'.format(topic))
+
+
+            if readT:
+                # ----------------------------------
+                # Showing The Reading Time Split
+                # ----------------------------------
+                col.header('Reading Time For Articles in {}'.format(topic))
+                filter = filtTopic(df = final, topic = topic)
+                readTime = readingDist(filter)
+                col.plotly_chart(readTime)
+
+
     # ----------------------------------
     # Find Article Based On Keywords 
     # ----------------------------------
     elif choice == 'Search Articles':
-        st.header('Select Appropriate Filters To Find Article')
+        st.title('Find Articles')
         st.subheader('')
         text = st.text_input('Enter Keyword To Search Through Entire Database')
+        # text = st.selectbox('Enter Keyword To Search Through Entire Database', 
+                            # [''] + final['Titles'].tolist())
         col1, _, col2 = st.beta_columns((1, 0.1, 1))
     
         # ----------------------------------
