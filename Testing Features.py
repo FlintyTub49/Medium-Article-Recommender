@@ -17,7 +17,7 @@ PAGE_CONFIG = {"page_title" : "Medium Article Recommender", "layout" : "centered
 st.set_page_config(layout = 'wide')
 
 package_dir = os.path.dirname(os.path.abspath('app-v2.py'))
-data_file = os.path.join(package_dir,'Data Files/final.csv.hdf5')
+data_file = os.path.join(package_dir,'Data Files/data.csv.hdf5')
 final = vaex.open(data_file)
 
 
@@ -86,7 +86,7 @@ def filtKeyword(df, text):
     if text == '' or text == ' ':
         return df
     else:
-        return df[df['Titles'].str.contains(text)]
+        return df[df['Search'].str.contains(text.strip())]
 
 
 # ----------------------------------
@@ -373,18 +373,18 @@ def main():
         # ----------------------------------
         _, midi, _ = st.beta_columns((0.3, 5.4, 0.3))
         if search:
-            # Filtering Topic
-            display = filtTopic(df = final, topic = topic)
+            # Filtering Keyword
+            display = filtKeyword(df = final, text = text)
             
             # Filtering Time
             display = filtTime(df = display, time1 = time1, time2 = time2)
             
-            # Filtering Keyword
-            display = filtKeyword(df = display, text = text)
+            # Filtering Topic
+            display = filtTopic(df = display, topic = topic)
             
-            if display.shape[0] > 50:
+            if display.shape[0] > 0:
                 # Checking if we have 50 values to print, otherwise we print the entire subset
-                if display.shape[0] >= 40: 
+                if display.shape[0] >= 50: 
                     samp = 50
                 else:
                     samp = display.shape[0]
