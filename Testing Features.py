@@ -279,12 +279,13 @@ def main():
         dist = f1.checkbox(text)
         wc = f1.checkbox('WordCloud')
         readT = f2.checkbox('Reading Time Distribution')
+        wordSim = f2.checkbox('Word Similarities')
         
         
         _, col, _ = st.beta_columns((1, 2, 1))
         col.write('')
 
-        if not dist and not wc and not readT:
+        if not dist and not wc and not readT and not wordSim:
             col.subheader('Select Visualizations To Display')
 
         else:
@@ -321,6 +322,15 @@ def main():
                 filter = filtTopic(df = final, topic = topic)
                 readTime = readingDist(filter)
                 col.plotly_chart(readTime)
+
+            
+            if wordSim:
+                # ----------------------------------
+                # Showing The Appropriate WordCloud
+                # ----------------------------------
+                col.header('Word Similarities For {} Topics'.format(topic))
+                sim20 = os.path.join(package_dir,'wordRelations/{}.jpg'.format(topic))
+                col.image(sim20, caption = 'Word Similarities For {}'.format(topic))
 
 
     # ----------------------------------
