@@ -109,7 +109,20 @@ def plotDistTopics(df):
 def plotDistWords(df):
     filter = df[df['Actual Text'].str.count(' ') < 4500]
     count = (filter['Actual Text'].str.count(' ') + 1).tolist()
-    fig = px.histogram(y = count, labels = {'y' : 'No. Of Words'}, orientation = 'h')
+    fig = px.histogram(y = count, labels = {'y' : 'No. Of Words'}, orientation = 'h', marginal = 'box')
+    fig.update_layout({
+        'plot_bgcolor': 'rgba(0, 0, 0, 0)',
+        'paper_bgcolor': 'rgba(0, 0, 0, 0)',
+    })
+    return fig
+
+
+# --------------------------------------
+# Plotting Distribution Of Reading Time
+# --------------------------------------
+def readingDist(df):
+    demo = df[df['Reading Time'] < 30]
+    fig = px.histogram(x = demo['Reading Time'].tolist(), labels = {'x': 'Reading Time'}, marginal = 'box')
     fig.update_layout({
         'plot_bgcolor': 'rgba(0, 0, 0, 0)',
         'paper_bgcolor': 'rgba(0, 0, 0, 0)',
@@ -120,9 +133,11 @@ def plotDistWords(df):
 # ----------------------------------
 # Plotting Distribution Of Words
 # ----------------------------------
-def readingDist(df):
-    demo = df[df['Reading Time'] < 30]
-    fig = px.histogram(x = demo['Reading Time'].tolist(), labels = {'x': 'Reading Time'})
+@st.cache()
+def topicBubble():
+    cluster_file = os.path.join(package_dir, 'Data Files/clusters.csv')
+    cluster = pd.read_csv(cluster_file)
+    fig = px.scatter(cluster, x = 'X', y = 'Y', size = 'Count', color = 'Category', size_max = 50)
     fig.update_layout({
         'plot_bgcolor': 'rgba(0, 0, 0, 0)',
         'paper_bgcolor': 'rgba(0, 0, 0, 0)',
@@ -153,18 +168,20 @@ def main():
                    'Cloud Development', 'Machine Learning & Deep Learning']
     
     # ----------------------------------
-    # Side Bar Menu
+    # Side Bar Menu & Content
     # ----------------------------------
+    st.sidebar.image(os.path.join(package_dir,'Data Files/medium.png'))
     menu = ['Recommendation System', 'Visualizations', 'Search Articles']
     choice = st.sidebar.selectbox('Menu', menu)
-    
+    st.sidebar.write('Description About the App')
+    # st.sidebar.markdown(page_bg_img, unsafe_allow_html=True)
     
     # ----------------------------------
     # Main Recommendation System 
     # ----------------------------------
     if choice == 'Recommendation System':
         st.title('Medium Article Recommendation System')
-        st.subheader('A Recommendation Systemn for Medium Articles Based on Topic Selection')
+        # st.subheader('A Recommendation Systemn for Medium Articles Based on Topic Selection')
         st.markdown(page_bg_img, unsafe_allow_html=True)
 
         
@@ -199,7 +216,7 @@ def main():
         
         st.write('')
         a = st.button('Get Recommendation')
-        col1, _, col2 = st.beta_columns((1.2, 0.15, 1.25))
+        col1, col2 = st.beta_columns((1.25, 1.25))
         
         
         # ----------------------------------
@@ -226,34 +243,39 @@ def main():
         else:
             bubble = makeComparison(score = rad_values, actual = actual, topics = topic_names)
         
-        title
-        col1.subheader('Scores For Each Topic')
-        col1.plotly_chart(bubble, use_container_width = True)
-        col1.markdown(page_bg_img, unsafe_allow_html = True)
+        col2.header('Scores For Each Topic')
+        col2.plotly_chart(bubble, use_container_width = True)
+        col2.markdown(page_bg_img, unsafe_allow_html = True)
         
         
-        # ----------------------------------
+        # --------------------------------------
+        # Printing The Distribution of Articels 
+        # --------------------------------------
+        col1.header('Spread Of Topics')
+        fig = topicBubble()
+        col1.plotly_chart(fig, width = 900)
+
+
+        # --------------------------------------
         # Printing The Recommended Article 
-        # ----------------------------------
-        col2.subheader('The Recommended Article is')
-        col2.write('')
-        col2.write('')
-        col2.title('{}'.format(title))
-        col2.subheader('Reading Time:   {}  minutes'.format(rt))
-        col2.write('')
-        if_link = '<iframe src="' + link + '"><i/frame>'
+        # --------------------------------------
+        st.subheader('The Recommended Article is')
+        st.write('')
+        st.write('')
+        st.title('{}'.format(title))
+        st.subheader('Reading Time:   {}  minutes'.format(rt))
+        st.write('')
         if a:
-            col2.write(if_link, unsafe_allow_html = True)
-            col2.write('')
-            if col2.button('Go To Page'):
-                webbrowser.open_new_tab(link)
+            image = os.path.join(package_dir,'Data Files/medium.png') 
+            # st.markdown('[[Test]({})]({})'.format(image, link), unsafe_allow_html = True)
+            st.subheader('[Go To Article Or Click Here]({})'.format(link))
         else:
-            col2.subheader('{}'.format(link))
+            st.subheader('{}'.format(link))
         col2.markdown(page_bg_img, unsafe_allow_html = True)
     
 
     # ----------------------------------
-    # Find Article Based On Keywords 
+    # All the Visualizations 
     # ----------------------------------
     elif choice == 'Visualizations':
         st.header('Visualizations')
@@ -338,10 +360,7 @@ def main():
     # ----------------------------------
     elif choice == 'Search Articles':
         st.title('Find Articles')
-        st.subheader('')
         text = st.text_input('Enter Keyword To Search Through Entire Database')
-        # text = st.selectbox('Enter Keyword To Search Through Entire Database', 
-                            # [''] + final['Titles'].tolist())
         col1, _, col2 = st.beta_columns((1, 0.1, 1))
     
         # ----------------------------------
@@ -384,8 +403,8 @@ def main():
             
             if display.shape[0] > 0:
                 # Checking if we have 50 values to print, otherwise we print the entire subset
-                if display.shape[0] >= 50: 
-                    samp = 50
+                if display.shape[0] >= 15: 
+                    samp = 15
                 else:
                     samp = display.shape[0]
                 
