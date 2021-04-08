@@ -27,7 +27,7 @@ final = vaex.open(data_file)
 def makeSingleGraph(score, topics):
     fig = go.Figure()
     fig.add_trace(go.Scatterpolar(r = score, theta = topics, fill = 'toself', name = 'User Score'))
-    fig.update_layout(polar = dict(radialaxis = dict(visible = True, range = [0, 1])), showlegend = True)
+    fig.update_layout(polar = dict(radialaxis = dict(visible = True, range = [0, 1]), bgcolor='#0E1117'), showlegend = True)
     return fig
 
 
@@ -38,7 +38,7 @@ def makeComparison(score, actual, topics):
     fig = go.Figure()
     fig.add_trace(go.Scatterpolar(r = score, theta = topics, fill = 'toself', name = 'User Score'))
     fig.add_trace(go.Scatterpolar(r = actual, theta = topics, fill = 'toself', name = 'Actual Score'))
-    fig.update_layout(polar = dict(radialaxis = dict(visible = True, range = [0, 1])), showlegend = True)
+    fig.update_layout(polar = dict(radialaxis = dict(visible = True, range = [0, 1]), bgcolor='#0E1117'), showlegend = True)
     return fig
 
 
@@ -139,8 +139,8 @@ def topicBubble():
     cluster = pd.read_csv(cluster_file)
     fig = px.scatter(cluster, x = 'X', y = 'Y', size = 'Count', color = 'Category', size_max = 50)
     fig.update_layout({
-        'plot_bgcolor': 'rgba(0, 0, 0, 0)',
-        'paper_bgcolor': 'rgba(0, 0, 0, 0)',
+        'plot_bgcolor': '#0E1117',
+        'paper_bgcolor': '#0E1117',
     })
     return fig
 
@@ -171,17 +171,24 @@ def main():
     # Side Bar Menu & Content
     # ----------------------------------
     st.sidebar.image(os.path.join(package_dir,'Data Files/medium.png'))
-    menu = ['Recommendation System', 'Visualizations', 'Search Articles']
+    menu = ['Recommendation System', 'Search Articles', 'Visualizations']
     choice = st.sidebar.selectbox('Menu', menu)
-    st.sidebar.write('Description About the App')
-    # st.sidebar.markdown(page_bg_img, unsafe_allow_html=True)
+
     
     # ----------------------------------
     # Main Recommendation System 
     # ----------------------------------
     if choice == 'Recommendation System':
+        # ----------------------------------
+        # Explainantion About The Page in Sidebar 
+        # ----------------------------------
+        st.sidebar.header('Recommendation System')
+        st.sidebar.markdown('<p style="text-align:justify">Many times we find ourselves in positions where we want to read \
+            an article based on a certain topic or topics but we do not know which is the best one for us.The app will help \
+                us here.<br><br> The app will take your scores for each of the defined 10 topics and search our database for \
+                    Medium articles which are best suited to you based on your preference scores.</p>', unsafe_allow_html=True)
+        
         st.title('Medium Article Recommendation System')
-        # st.subheader('A Recommendation Systemn for Medium Articles Based on Topic Selection')
         st.markdown(page_bg_img, unsafe_allow_html=True)
 
         
@@ -268,7 +275,7 @@ def main():
         if a:
             image = os.path.join(package_dir,'Data Files/medium.png') 
             # st.markdown('[[Test]({})]({})'.format(image, link), unsafe_allow_html = True)
-            st.subheader('[Go To Article Or Click Here]({})'.format(link))
+            st.subheader('[Go To Article]({})'.format(link))
         else:
             st.subheader('{}'.format(link))
         col2.markdown(page_bg_img, unsafe_allow_html = True)
@@ -278,7 +285,17 @@ def main():
     # All the Visualizations 
     # ----------------------------------
     elif choice == 'Visualizations':
-        st.header('Visualizations')
+        # ----------------------------------
+        # Explainantion About The Page in Sidebar 
+        # ----------------------------------
+        st.sidebar.header('Visualizations')
+        st.sidebar.markdown('<p style="text-align:justify">This section is about visualizations. Here we can get insights\
+             about the data via various graphs that are generated on the basis of a particular topic or all topics all togther. \
+                <br><br>The available visualizations are <ul style="text-align:justify"><li>Word Count of Articles</li><li>Reading \
+                    Time Distribution of Articles</li><li>WordCloud for Articles</li><li>Word Similarities in \
+                        Articles</li></p>', unsafe_allow_html=True)
+
+        st.title('Visualizations')
         st.subheader('Select Appropriate Filters To Change Dashboard')
         st.write('')
         st.markdown(page_bg_img, unsafe_allow_html = True)
@@ -295,13 +312,13 @@ def main():
         # ----------------------------------
         # Show Which Graphs To Display
         # ----------------------------------
-        _, f1, _, f2, _ = st.beta_columns((1.5, 1.2, 0.6, 1.2, 1.5,))
+        f1, f2, f3, f4 = st.beta_columns((1.5, 1.5, 1.5, 1.2))
         if topic == 'All': text = 'Count Of Topics'
         else: text = 'WordCount of Articles'
         dist = f1.checkbox(text)
-        wc = f1.checkbox('WordCloud')
-        readT = f2.checkbox('Reading Time Distribution')
-        wordSim = f2.checkbox('Word Similarities')
+        wc = f2.checkbox('WordCloud')
+        readT = f3.checkbox('Reading Time Distribution')
+        wordSim = f4.checkbox('Word Similarities')
         
         
         _, col, _ = st.beta_columns((1, 2, 1))
@@ -331,9 +348,9 @@ def main():
                 # ----------------------------------
                 # Showing The Appropriate WordCloud
                 # ----------------------------------
-                col.header('WordCloud For {} Topics'.format(topic))
+                col.header('WordCloud For {} Articles'.format(topic))
                 wc = os.path.join(package_dir,'wcClouds/{}.jpg'.format(topic))
-                col.image(wc, caption = 'WordCloud For {}'.format(topic))
+                col.image(wc, caption = 'WordCloud For {} Articles'.format(topic))
 
 
             if readT:
@@ -359,7 +376,19 @@ def main():
     # Find Article Based On Keywords 
     # ----------------------------------
     elif choice == 'Search Articles':
-        st.title('Find Articles')
+        # ----------------------------------
+        # Explainantion About The Page in Sidebar 
+        # ----------------------------------
+        st.sidebar.header('Visualizations')
+        st.sidebar.markdown('<p style="text-align:justify">If we do not want to get an recommended article and just look for \
+            articles on our own based on certain conditons, we can do that here.<br>The kind of filter available on this \
+                page are:<ul style="text-align:justify"><li><u>Keyword:</u> Search for an Article Title based on a particular \
+                    keyword</li><li><u>Topic:</u> You can search for articles in all topics or just in some specific topic</li>\
+                        <li><u>Reading Time:</u> If you want an article that can be finished in a particular amount of time, you can \
+                            specify that here</li></ul></p>', unsafe_allow_html=True)
+
+
+        st.title('Search Articles')
         text = st.text_input('Enter Keyword To Search Through Entire Database')
         col1, _, col2 = st.beta_columns((1, 0.1, 1))
     
