@@ -274,7 +274,6 @@ def main():
         st.write('')
         if a:
             image = os.path.join(package_dir,'Data Files/medium.png') 
-            # st.markdown('[[Test]({})]({})'.format(image, link), unsafe_allow_html = True)
             st.subheader('[Go To Article]({})'.format(link))
         else:
             st.subheader('{}'.format(link))
