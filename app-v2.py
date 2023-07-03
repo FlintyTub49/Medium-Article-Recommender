@@ -133,7 +133,7 @@ def readingDist(df):
 # ----------------------------------
 # Plotting Distribution Of Words
 # ----------------------------------
-@st.cache()
+@st.cache_data()
 def topicBubble():
     cluster_file = os.path.join(package_dir, 'Data Files/clusters.csv')
     cluster = pd.read_csv(cluster_file)
@@ -198,7 +198,7 @@ def main():
         st.subheader('Tune The Sliders to Get Recommendations Accordingly')
         st.title('')
 
-        _, col3, _, col4, _ = st.beta_columns((0.1, 1, 0.25, 1, 0.1))
+        _, col3, _, col4, _ = st.columns((0.1, 1, 0.25, 1, 0.1))
         startups = col3.slider(label = 'Business and Startups', min_value = 0.0, max_value = 1.0, step = 0.05, 
                                value = 0.2, key = 'Business and Startups')
         coding = col3.slider(label = 'Fundamental Coding', min_value = 0.0, max_value = 1.0, step = 0.05, 
@@ -223,7 +223,7 @@ def main():
         
         st.write('')
         a = st.button('Get Recommendation')
-        col1, col2 = st.beta_columns((1.25, 1.25))
+        col1, col2 = st.columns((1.25, 1.25))
         
         
         # ----------------------------------
@@ -312,7 +312,7 @@ def main():
         # ----------------------------------
         # Show Which Graphs To Display
         # ----------------------------------
-        f1, f2, f3, f4 = st.beta_columns((1.5, 1.5, 1.5, 1.2))
+        f1, f2, f3, f4 = st.columns((1.5, 1.5, 1.5, 1.2))
         if topic == 'All': text = 'Count Of Topics'
         else: text = 'WordCount of Articles'
         dist = f1.checkbox(text)
@@ -321,7 +321,7 @@ def main():
         wordSim = f4.checkbox('Word Similarities')
         
         
-        _, col, _ = st.beta_columns((1, 2, 1))
+        _, col, _ = st.columns((1, 2, 1))
         col.write('')
 
         if not dist and not wc and not readT and not wordSim:
@@ -390,7 +390,7 @@ def main():
 
         st.title('Search Articles')
         text = st.text_input('Enter Keyword To Search Through Entire Database')
-        col1, _, col2 = st.beta_columns((1, 0.1, 1))
+        col1, _, col2 = st.columns((1, 0.1, 1))
     
         # ----------------------------------
         # Query To Find In What Topic
@@ -410,7 +410,7 @@ def main():
         # Query To Search And Display Output
         # ----------------------------------
         st.write('')
-        _, mid, _ = st.beta_columns((1, 4, 1))
+        _, mid, _ = st.columns((1, 4, 1))
         mid.markdown(page_bg_img, unsafe_allow_html = True)
         search = mid.button('Search Database')
         st.write('')
@@ -419,7 +419,7 @@ def main():
         # ----------------------------------
         # Searching According To The Queries text, topic, time1, time2
         # ----------------------------------
-        _, midi, _ = st.beta_columns((0.3, 5.4, 0.3))
+        _, midi, _ = st.columns((0.3, 5.4, 0.3))
         if search:
             # Filtering Keyword
             display = filtKeyword(df = final, text = text)
